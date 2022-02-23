@@ -33,5 +33,3 @@ if (extension_loaded('gettext')) {
   global $wpng;
   $wpng = new NativeGettextForWP();
 }
-
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'msb_add_settings_link' );
