@@ -1,4 +1,4 @@
-=== WP Native Gettext ===
+=== Native Gettext for Wordpress ===
 
 Contributors: colinleroy
 Tags: performance, gettext, translation
