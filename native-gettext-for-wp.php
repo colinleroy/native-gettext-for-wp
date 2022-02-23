@@ -24,7 +24,7 @@ class NativeGettextForWP {
     $this->nltd = new NativeLoadTextdomain();
     $this->nltd->init();
   }
-  
+
   public function init() {
   }
 }
