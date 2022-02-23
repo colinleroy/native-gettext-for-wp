@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:  WP Native Gettext
- * Plugin URI:   https://www.colino.net/wordpress/
+ * Plugin URI:   https://github.com/colinleroy/wp-native-gettext
  * Description:  A minimal native gettext implementation.
  * Version:      1.0.0
  * Author:       Colin Leroy-Mira <colin@colino.net>
