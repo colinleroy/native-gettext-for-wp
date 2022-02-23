@@ -113,7 +113,7 @@ class NativeMO extends Gettext_Translations {
 		if ($context === null) {
 			// Translate without a context
 			if (($t = dgettext ($this->domain, $singular)) != $singular) {
-  			if (!self::$this->header_sent) {
+  			if (!self::$header_sent) {
   				header("X-Native-Gettext: 1");
   				self::$header_sent = true;
   			}
@@ -182,7 +182,7 @@ class NativeMO extends Gettext_Translations {
 			$t = dngettext ($this->domain, $T, $plural, $count);
 
 			if (($T != $t) && ($t != $plural)) {
-  			if (!self::$this->header_sent) {
+  			if (!self::$header_sent) {
   				header("X-Native-Gettext: 1");
   				self::$header_sent = true;
   			}
@@ -253,7 +253,7 @@ class NativeMO extends Gettext_Translations {
 			return false;
 
 		// Make sure that the language-directory exists
-		$path = WP_CONTENT_DIR . '/wp-native-gettext/localize/' . $locale . '/LC_MESSAGES';
+		$path = WP_CONTENT_DIR . '/native-gettext-for-wp/localize/' . $locale . '/LC_MESSAGES';
 
 		if ( !wp_mkdir_p( $path ) )
 			return false;
@@ -265,7 +265,7 @@ class NativeMO extends Gettext_Translations {
 			return false;
 
 		// Setup the "domain" for gettext
-		bindtextdomain( $domain, WP_CONTENT_DIR . '/wp-native-gettext/localize/' );
+		bindtextdomain( $domain, WP_CONTENT_DIR . '/native-gettext-for-wp/localize/' );
 		bind_textdomain_codeset( $domain, $this->codepage );
 
 		// Do the final stuff and return success
