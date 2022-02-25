@@ -23,3 +23,7 @@ by the native library.
 
 If your Wordpress install is in English, this plugin has no purpose. Otherwise,
 it can help speed up your install quite a lot.
+
+Requirements:
+- php-gettext
+- OS-level support for the locale(s) you want to translate to.
