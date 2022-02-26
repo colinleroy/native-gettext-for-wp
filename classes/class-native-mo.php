@@ -299,8 +299,8 @@ class NativeMO extends Gettext_Translations {
 }
 
 function locale_not_supported_notice( $locale ) {
-  $class = 'notice notice-warning';
-  $message = __( 'Native Gettext disabled: Locale ' . $locale . ' is not supported on this system', 'native-gettext' );
+  $class = 'notice notice-warning is-dismissible';
+  $message = sprintf (__( 'Native Gettext disabled: Locale %s is not supported on this system', 'native-gettext' ), $locale );
 
   printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }
