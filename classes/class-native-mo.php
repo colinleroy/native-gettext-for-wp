@@ -36,6 +36,8 @@ class NativeMO extends Gettext_Translations {
   function get_header ( $header ) { return false; }
   function translate_entry ( &$entry ) { return false; }
 
+  static $locale_not_supported_notice_displayed = false;
+
   /**
   * Given the number of items, returns the 0-based index of the plural form to use
   *
@@ -245,7 +247,19 @@ class NativeMO extends Gettext_Translations {
       putenv( 'LANGUAGE=' . $locale . '.' . $this->codepage );
     }
     //setlocale (LC_ALL, $locale);
-    setlocale( LC_MESSAGES, $locale, $locale . '.' . $this->codepage );
+    if ( ! setlocale( LC_MESSAGES, $locale, $locale . '.' . $this->codepage ) ) {
+      if ( ! self::$header_sent) {
+          header( 'X-Native-Gettext: '.$locale.' not supported.' );
+          self::$header_sent = true;
+      }
+      if ( ! self::$locale_not_supported_notice_displayed ) {
+        add_action( 'admin_notices', function() use ( $locale ) {
+          locale_not_supported_notice ( $locale );
+        } );
+        self::$locale_not_supported_notice_displayed = true;
+      }
+      return false;
+    }
 
     $info = pathinfo( $filename );
     $name = basename( $filename, '.' . $info[ 'extension' ] );
@@ -271,7 +285,10 @@ class NativeMO extends Gettext_Translations {
     }
 
     // Setup the "domain" for gettext
-    bindtextdomain( $domain, WP_CONTENT_DIR . '/native-gettext-for-wp/localize/' );
+    if ( ! bindtextdomain( $domain, WP_CONTENT_DIR . '/native-gettext-for-wp/localize/' ) ) {
+      return false;
+    }
+
     bind_textdomain_codeset( $domain, $this->codepage );
 
     // Do the final stuff and return success
@@ -279,4 +296,11 @@ class NativeMO extends Gettext_Translations {
 
     return true;
   }
+}
+
+function locale_not_supported_notice( $locale ) {
+  $class = 'notice notice-warning';
+  $message = __( 'Native Gettext disabled: Locale ' . $locale . ' is not supported on this system', 'native-gettext' );
+
+  printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }
