@@ -252,7 +252,7 @@ class NativeMO extends Gettext_Translations {
           header( 'X-Native-Gettext: '.$locale.' not supported.' );
           self::$header_sent = true;
       }
-      if ( ! self::$locale_not_supported_notice_displayed ) {
+      if ( ! self::$locale_not_supported_notice_displayed && is_admin() ) {
         add_action( 'admin_notices', function() use ( $locale ) {
           locale_not_supported_notice ( $locale );
         } );
@@ -269,8 +269,9 @@ class NativeMO extends Gettext_Translations {
       return false;
     }
 
+    $textdomains_path = WP_CONTENT_DIR . '/native-gettext/localize/';
     // Make sure that the language-directory exists
-    $path = WP_CONTENT_DIR . '/native-gettext-for-wp/localize/' . $locale . '/LC_MESSAGES';
+    $path = $textdomains_path . $locale . '/LC_MESSAGES';
 
     if ( !$dir_created && !wp_mkdir_p( $path ) ) {
       return false;
@@ -280,12 +281,15 @@ class NativeMO extends Gettext_Translations {
     // Make sure that the MO-File is existant at the destination
     $fn = $path . '/' . $domain . '.mo';
 
-    if ( !is_file( $fn ) && !@copy( $filename, $fn ) ) {
-      return false;
+    if ( !is_file( $fn ) ) {
+      // Try to symlink, fallback to copy
+      if ( ! @symlink( $filename, $fn ) && !@copy( $filename, $fn ) ) {
+        return false;
+      }
     }
 
     // Setup the "domain" for gettext
-    if ( ! bindtextdomain( $domain, WP_CONTENT_DIR . '/native-gettext-for-wp/localize/' ) ) {
+    if ( ! bindtextdomain( $domain, $textdomains_path ) ) {
       return false;
     }
 

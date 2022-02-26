@@ -5,7 +5,7 @@ Tags: performance, gettext, translation
 Requires at least: 4.7
 Tested up to: 5.9.1
 Requires PHP: 5.3
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

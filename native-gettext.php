@@ -3,7 +3,7 @@
  * Plugin Name:  Native Gettext
  * Plugin URI:   https://github.com/colinleroy/native-gettext-for-wp
  * Description:  A minimal native gettext implementation.
- * Version:      1.0.2
+ * Version:      1.0.3
  * Author:       Colin Leroy-Mira <colin@colino.net>
  * Author URI:   https://www.colino.net/wordpress/
  * License:      GPL-3.0+
