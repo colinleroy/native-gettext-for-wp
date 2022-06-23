@@ -116,7 +116,7 @@ class NativeMO extends Gettext_Translations {
       // Translate without a context
       if (($t = dgettext ($this->domain, $singular)) != $singular) {
         if (!self::$header_sent) {
-          header("X-Native-Gettext: 1");
+          $this->add_header("1");
           self::$header_sent = true;
         }
         return $t;
@@ -187,7 +187,7 @@ class NativeMO extends Gettext_Translations {
 
       if (($T != $t) && ($t != $plural)) {
         if (!self::$header_sent) {
-          header("X-Native-Gettext: 1");
+          $this->add_header("1");
           self::$header_sent = true;
         }
         return $t;
@@ -221,7 +221,7 @@ class NativeMO extends Gettext_Translations {
     $disabledFuncs = ini_get('disable_functions');
     if ($disabledFuncs) {
       $disabledArr = array_map('trim', explode(',', $disabledFuncs));
-      $available = !in_array($func, $disabledArr);
+      $available = !in_array('putenv', $disabledArr);
       return $available;
     }
     $available = true;
@@ -249,7 +249,7 @@ class NativeMO extends Gettext_Translations {
     //setlocale (LC_ALL, $locale);
     if ( ! setlocale( LC_MESSAGES, $locale, $locale . '.' . $this->codepage ) ) {
       if ( ! self::$header_sent) {
-          header( 'X-Native-Gettext: '.$locale.' not supported.' );
+          $this->add_header($locale." not supported.");
           self::$header_sent = true;
       }
       if ( ! self::$locale_not_supported_notice_displayed && is_admin() ) {
@@ -299,6 +299,13 @@ class NativeMO extends Gettext_Translations {
     $this->domain = $domain;
 
     return true;
+  }
+
+  function add_header($header_value) {
+    add_filter( 'wp_headers', function( array $headers ) use ($header_value) : array {
+      $headers["X-Native-Gettext"] = $header_value;
+      return $headers;
+    });
   }
 }
 
