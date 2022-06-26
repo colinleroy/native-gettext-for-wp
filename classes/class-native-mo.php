@@ -16,17 +16,27 @@
 * @license GNU General Public License version 3 or later
 */
 
-class NativeMO extends Gettext_Translations {
+class NativeGettextMO extends Gettext_Translations {
 
   private static $header_sent = false;
 
   const CONTEXT_SEP = "\x04";
+
+  private $wp_domain = null;
+  public $mo_file = null;
+
   private $domain = null;
   private $codepage = 'UTF8';
 
   // Merged domains
   private $pOthers = array ();
   private $sOthers = array ();
+
+  public $entries = array ();
+
+  public function __construct($wp_domain) {
+    $this->wp_domain = $wp_domain;
+  }
 
   // Some Dummy-Function just to be API-compatible
   function add_entry ( $entry ) { return false; }
@@ -37,6 +47,7 @@ class NativeMO extends Gettext_Translations {
   function translate_entry ( &$entry ) { return false; }
 
   static $locale_not_supported_notice_displayed = false;
+  static $multiple_loadtextdomain_displayed = false;
 
   /**
   * Given the number of items, returns the 0-based index of the plural form to use
@@ -66,8 +77,18 @@ class NativeMO extends Gettext_Translations {
   * @return void
   **/
   function merge_with (&$other) {
-    if ( !( $other instanceof NOOP_Translations ) ) {
+    if ($other instanceof NativeGettextMO) {
       $this->pOthers [] = $other;
+    } else if ( !( $other instanceof NOOP_Translations ) ) {
+      if ( ! self::$multiple_loadtextdomain_displayed && is_admin() ) {
+        add_action( 'admin_notices', function() use ( $other ) {
+          multiple_textdomain_notice ( $other );
+        } );
+        self::$multiple_loadtextdomain_displayed = true;
+      }
+      foreach ( $other->entries as $entry ) {
+        $this->entries[ $entry->key() ] = $entry;
+      }
     }
   }
 
@@ -127,6 +148,10 @@ class NativeMO extends Gettext_Translations {
       $t = dgettext ($this->domain, $T);
 
       if ($T != $t) {
+        if (!self::$header_sent) {
+          $this->add_header("1");
+          self::$header_sent = true;
+        }
         return $t;
       }
     }
@@ -178,6 +203,10 @@ class NativeMO extends Gettext_Translations {
       $t = dngettext ($this->domain, $singular, $plural, $count);
 
       if (($t != $singular) && ($t != $plural)) {
+        if (!self::$header_sent) {
+          $this->add_header("1");
+          self::$header_sent = true;
+        }
         return $t;
       }
     } else {
@@ -297,6 +326,7 @@ class NativeMO extends Gettext_Translations {
 
     // Do the final stuff and return success
     $this->domain = $domain;
+    $this->mo_file = $filename;
 
     return true;
   }
@@ -312,6 +342,13 @@ class NativeMO extends Gettext_Translations {
 function locale_not_supported_notice( $locale ) {
   $class = 'notice notice-warning is-dismissible';
   $message = sprintf (__( 'Native Gettext disabled: Locale %s is not supported on this system', 'native-gettext' ), $locale );
+
+  printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+}
+
+function multiple_textdomain_notice( $other ) {
+  $class = 'notice notice-warning is-dismissible';
+  $message = sprintf (__( 'Native Gettext warning: Another plugin has an override_load_textdomain filter active and some translations have been handled by the %s class instead of the NativeGettextMO class. Performance is not the best it could be.', 'native-gettext' ), get_class($other));
 
   printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }

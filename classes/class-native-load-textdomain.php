@@ -26,28 +26,24 @@ class NativeLoadTextdomain {
 	
 	function nltd_load_textdomain_override( $retval, $domain, $mofile ) {
 		global $l10n;
-		$result = false;
 		$mo = NULL;
 
 		do_action( 'load_textdomain', $domain, $mofile );
 		$mofile = apply_filters( 'load_textdomain_mofile', $mofile, $domain );
 
 		if ( !is_readable( $mofile ) ) {
-			return false; // return false is important so load_plugin_textdomain/load_theme_textdomain/... can call load_textdomain for different locations
-		} 
+			return $retval;
+		}
 
-		$mo = new NativeMO ();
+		$mo = new NativeGettextMO ($domain);
 		if ( $mo->import_from_file( $mofile ) ) { 
-			$result = true;
-		} 
-
-		if ( $mo !== NULL ) {
 			if ( isset( $l10n[$domain] ) ) {
 				$mo->merge_with( $l10n[$domain] );
 			}
-			$l10n[$domain] = $mo;
+			$l10n[$domain] = &$mo;
+			$retval = true;
 		}
 
-		return $result;
+		return $retval;
 	}
 }
