@@ -45,6 +45,7 @@ class NativeGettextMO extends Gettext_Translations {
   function set_headers ( $headers ) { return false; }
   function get_header ( $header ) { return false; }
   function translate_entry ( &$entry ) { return false; }
+  function get_filename () { return $mo_file; }
 
   static $locale_not_supported_notice_displayed = false;
   static $multiple_loadtextdomain_displayed = false;
