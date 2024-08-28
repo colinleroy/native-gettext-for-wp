@@ -48,7 +48,6 @@ class NativeGettextMO extends Gettext_Translations {
   function get_filename () { return $mo_file; }
 
   static $locale_not_supported_notice_displayed = false;
-  static $multiple_loadtextdomain_displayed = false;
 
   /**
   * Given the number of items, returns the 0-based index of the plural form to use
@@ -80,13 +79,7 @@ class NativeGettextMO extends Gettext_Translations {
   function merge_with (&$other) {
     if ($other instanceof NativeGettextMO) {
       $this->pOthers [] = $other;
-    } else if ( !( $other instanceof NOOP_Translations ) ) {
-      if ( ! self::$multiple_loadtextdomain_displayed && is_admin() ) {
-        add_action( 'admin_notices', function() use ( $other ) {
-          multiple_textdomain_notice ( $other );
-        } );
-        self::$multiple_loadtextdomain_displayed = true;
-      }
+    } else if ( isset($other->entries) && !( $other instanceof NOOP_Translations ) ) {
       foreach ( $other->entries as $entry ) {
         $this->entries[ $entry->key() ] = $entry;
       }
@@ -343,13 +336,6 @@ class NativeGettextMO extends Gettext_Translations {
 function locale_not_supported_notice( $locale ) {
   $class = 'notice notice-warning is-dismissible';
   $message = sprintf (__( 'Native Gettext disabled: Locale %s is not supported on this system', 'native-gettext' ), $locale );
-
-  printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-}
-
-function multiple_textdomain_notice( $other ) {
-  $class = 'notice notice-warning is-dismissible';
-  $message = sprintf (__( 'Native Gettext warning: Another plugin has an override_load_textdomain filter active and some translations have been handled by the %s class instead of the NativeGettextMO class. Performance is not the best it could be.', 'native-gettext' ), get_class($other));
 
   printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
 }

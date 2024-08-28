@@ -3,9 +3,9 @@
 Contributors: colinleroy
 Tags: performance, gettext, translation
 Requires at least: 4.7
-Tested up to: 6.0
+Tested up to: 6.6.1
 Requires PHP: 5.3
-Stable tag: 1.1.1
+Stable tag: 1.1.4
 Donate link: https://paypal.me/colinleroymira
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
